@@ -9,9 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Room extends BaseDocument {
 
-    @Id
-    public String id;
-
 //    public Queue queue;
 
     public Track playingSong;

@@ -11,10 +11,12 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public void createNewUser(String name) {
+    public void createNewUser(String name, String password) {
 
         User user = new User();
-        user.setFirstName(name);
+        user.setUsername(name);
+        user.setPassword(password);
+        user.setRole("user");
 
         userRepository.save(user);
     }
