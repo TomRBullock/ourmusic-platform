@@ -25,3 +25,9 @@ security:
       user-authorization-uri: http://localhost:8091/auth/oauth/authorize
     resource:
       user-info-uri: http://localhost:8091/auth/user/me
+
+spotify:
+  client-id: 3bb1371bd1b748269233273ce39229c3
+  client-secret: f9e20d71dc45472782976c4fd6c1c8a2
+#  callback-uri: http://localhost:8091/spotify/auth/redirect
+  callback-uri: http://localhost:4200/spotify/auth/redirect
