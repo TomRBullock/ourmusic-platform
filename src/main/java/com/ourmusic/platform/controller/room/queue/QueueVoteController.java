@@ -1,4 +1,4 @@
-package com.ourmusic.platform.controller.room.queue.interact;
+package com.ourmusic.platform.controller.room.queue;
 
 import org.springframework.web.bind.annotation.RestController;
 
