@@ -18,33 +18,21 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter
 
     private static final String RESOURCE_ID = "resource_id";
 
-//    @Override
-//    public void configure(ResourceServerSecurityConfigurer resources) {
-//        resources.resourceId(RESOURCE_ID).stateless(false);
-//    }
+    @Override
+    public void configure(ResourceServerSecurityConfigurer resources) {
+        resources.resourceId(RESOURCE_ID).stateless(false);
+    }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
                 .cors().and()
-//                .csrf().disable()
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/api/user/create").permitAll()
                 .antMatchers("/api/user/**").authenticated()
                 .antMatchers("/**").permitAll();
     }
-
-//    @Bean
-//    CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.addAllowedOrigin("*");
-//        configuration.addAllowedHeader("*");
-//        configuration.addAllowedMethod("*");
-//        configuration.setAllowCredentials(true);
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
 
 }

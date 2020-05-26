@@ -6,6 +6,7 @@ import com.ourmusic.platform.model.User;
 import com.ourmusic.platform.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
@@ -29,6 +30,7 @@ public class UserResource {
         userService.createNewUser("test", "test");
     }
 
+    @PreAuthorize("#oauth2.hasScope('read')")
     @GetMapping()
     public ResponseEntity<String> getAuthedUsername(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(userDetails.getId());
