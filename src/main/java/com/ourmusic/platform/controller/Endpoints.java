@@ -32,7 +32,12 @@ public interface Endpoints {
 
         interface AUTHORIZATION {
             String ROOT = SPOTIFY.ROOT + "/auth";
-            String REDIRECT = "/redirect";
+            String CODE = "/code";
+            String IS_CONNECTED = "/is-connected";
+        }
+
+        interface USER {
+            String ROOT = SPOTIFY.ROOT + "/user";
         }
 
     }
