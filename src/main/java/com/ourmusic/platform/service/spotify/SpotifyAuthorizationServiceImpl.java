@@ -78,7 +78,9 @@ public class SpotifyAuthorizationServiceImpl extends SpotifyBaseService implemen
         userSpotifyCredentials.setAccessToken(codeCredentials.getAccessToken());
         userSpotifyCredentials.setTokenType(codeCredentials.getTokenType());
         userSpotifyCredentials.setScope(codeCredentials.getScope());
-        userSpotifyCredentials.setRefreshToken(codeCredentials.getRefreshToken());
+        if (codeCredentials.getRefreshToken() != null) {
+            userSpotifyCredentials.setRefreshToken(codeCredentials.getRefreshToken());
+        }
 
         Integer expiresIn = codeCredentials.getExpiresIn();
         Instant now = Instant.now();
