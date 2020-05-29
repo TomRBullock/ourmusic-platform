@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import ourmusic.spotify.client.vo.SpotifyCredentials;
 
 @Data
 @Document
@@ -18,5 +19,6 @@ public class User extends BaseDocument {
     private boolean credentialsNonExpired = true;
     private boolean enabled = true;
     private String role;
+
 
 }

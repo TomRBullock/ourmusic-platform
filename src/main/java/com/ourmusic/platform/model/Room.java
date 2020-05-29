@@ -1,6 +1,6 @@
 package com.ourmusic.platform.model;
 
-import com.ourmusic.platform.model.spotify.Track;
+import com.wrapper.spotify.model_objects.specification.TrackSimplified;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,10 +9,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Room extends BaseDocument {
 
-//    public Queue queue;
+    private TrackSimplified playingSong;
+    private String hostId;
+    private boolean active = false;
+    private boolean passwordProtected = false;
 
-    public Track playingSong;
+    private String roomName;
+    private String description;
 
-    public String hostRef;
+    //6 character String
+    private String code;
+    private String password;
 
 }

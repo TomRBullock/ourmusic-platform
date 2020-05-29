@@ -28,6 +28,8 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/api/user/create").permitAll()
                 .antMatchers("/api/user").authenticated()
+                .antMatchers("/api/spotify/auth").authenticated()
+                .antMatchers("/api/spotify/user").authenticated()
                 .antMatchers("/**").permitAll();
     }
 
