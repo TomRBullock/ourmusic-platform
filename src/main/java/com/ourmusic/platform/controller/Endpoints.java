@@ -23,8 +23,8 @@ public interface Endpoints {
         String ROOT = Endpoints.ROOT + "/room";
         String VALIDATE = "/validate";
 
-        interface SETUP {
-            String ROOT = ROOM.ROOT + "/setup";
+        interface ADMIN {
+            String ROOT = ROOM.ROOT + "/admin";
             String ACTIVATE = "/activate";
             String TOGGLE_PLAY = "/toggle-play";
         }

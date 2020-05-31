@@ -10,9 +10,9 @@ public interface RoomAdminService {
 
     void createNewRoom(String userId, RoomSetupVO setupVO);
 
-    boolean deleteRoom(String userId, String roomCode);
+    boolean deleteRoom(String userId, String roomId);
 
-    void activateRoom(String userId, String roomCode);
+    void toggleRoomActivation(String userId, String roomId);
 
     ResponseEntity<Boolean> togglePlayPause(String userId);
 

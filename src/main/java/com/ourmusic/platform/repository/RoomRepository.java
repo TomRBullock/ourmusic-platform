@@ -16,6 +16,6 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
     Optional<Room> findByCode(String Code);
 
-    long deleteByCodeAndHostId(String code, String hostId);
+    long deleteByIdAndHostId(String id, String hostId);
 
 }

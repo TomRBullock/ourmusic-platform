@@ -30,12 +30,20 @@ public class SpotifyPlayerServiceImpl extends SpotifyBaseService implements Spot
             spotifyClient.togglePlay().pauseUsersPlayback_Sync(accessToken);
         }
 
-        CurrentlyPlayingContext playingContext = spotifyClient.currentPlaybackInfo().getInformationAboutUsersCurrentPlayback_Sync(accessToken);
+//        CurrentlyPlayingContext playingContext = spotifyClient.currentPlaybackInfo().getInformationAboutUsersCurrentPlayback_Sync(accessToken);
+//
+//        if (playingContext != null) {
+//            return playingContext.getIs_playing() == newPlayState;
+//        }
 
-        if (playingContext != null) {
-            return playingContext.getIs_playing() == newPlayState;
-        }
+        return true;
+    }
 
-        return false;
+    @Override
+    public CurrentlyPlayingContext getUsersCurrentPlayback(String hostId) {
+        Optional<String> validAccessTokenOpt = spotifyAuthorizationService.getValidAccessToken(hostId);
+        return validAccessTokenOpt
+                .map(accessToken -> spotifyClient.currentPlaybackInfo().getInformationAboutUsersCurrentPlayback_Sync(accessToken))
+                .orElse(null);
     }
 }

@@ -4,6 +4,7 @@ import com.ourmusic.platform.model.Room;
 import com.ourmusic.platform.repository.RoomRepository;
 import com.ourmusic.platform.service.spotify.SpotifyPlayerService;
 import com.ourmusic.platform.vo.request.room.RoomSetupVO;
+import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlayingContext;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.ResponseEntity;
@@ -38,12 +39,12 @@ public class RoomAdminServiceImpl implements RoomAdminService {
     }
 
     private String generateRoomCode() {
-        return RandomStringUtils.randomAlphanumeric(8);
+        return RandomStringUtils.randomAlphanumeric(6,8).toUpperCase();
     }
 
     @Override
-    public boolean deleteRoom(String userId, String roomCode) {
-        long numDeleted = roomRepository.deleteByCodeAndHostId(roomCode, userId);
+    public boolean deleteRoom(String userId, String roomId) {
+        long numDeleted = roomRepository.deleteByIdAndHostId(roomId, userId);
         if (numDeleted > 0L) {
             return true;
         }
@@ -51,11 +52,21 @@ public class RoomAdminServiceImpl implements RoomAdminService {
     }
 
     @Override
-    public void activateRoom(String userId, String roomCode) {
+    public void toggleRoomActivation(String userId, String roomId) {
+
+        CurrentlyPlayingContext usersCurrentPlayback = spotifyPlayerService.getUsersCurrentPlayback(userId);
+        if (usersCurrentPlayback.getIs_playing()) {
+            togglePlayPause(userId);
+        }
+
         Optional<Room> currentActiveRoom = roomRepository.findByHostIdAndActiveIsTrue(userId);
         updateActiveStatus(currentActiveRoom, userId);
 
-        Optional<Room> existingRoom = roomRepository.findByCode(roomCode);
+        if (currentActiveRoom.isPresent() && currentActiveRoom.get().getId().equals(roomId)) {
+            return;
+        }
+
+        Optional<Room> existingRoom = roomRepository.findById(roomId);
         updateActiveStatus(existingRoom, userId);
     }
 
@@ -63,6 +74,7 @@ public class RoomAdminServiceImpl implements RoomAdminService {
         roomOpt.ifPresent(room -> {
             if(room.getHostId().equals(userId)) {
                 room.setActive(!room.isActive());
+                room.setPlay(false);
                 roomRepository.save(room);
             }
         });
@@ -77,7 +89,13 @@ public class RoomAdminServiceImpl implements RoomAdminService {
             return ResponseEntity.notFound().build();
         }
 
-        boolean toggled = spotifyPlayerService.togglePlayPause(userId,  activeRoomOpt.get().isPlay());
+        Room room = activeRoomOpt.get();
+        boolean toggled = spotifyPlayerService.togglePlayPause(userId,  room.isPlay());
+        if (toggled) {
+            room.setPlay(!room.isPlay());
+            roomRepository.save(room);
+        }
+
         return ResponseEntity.ok(toggled);
     }
 
