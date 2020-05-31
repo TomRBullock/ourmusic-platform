@@ -14,7 +14,9 @@ public class SpotifyPlayerServiceImpl extends SpotifyBaseService implements Spot
     @Autowired private SpotifyAuthorizationService spotifyAuthorizationService;
 
     @Override
-    public boolean togglePlayPause(String hostId, boolean play) {
+    public boolean togglePlayPause(String hostId, boolean playState) {
+        boolean newPlayState = !playState;
+
         Optional<String> validAccessTokenOpt = spotifyAuthorizationService.getValidAccessToken(hostId);
 
         if (!validAccessTokenOpt.isPresent()) {
@@ -22,7 +24,7 @@ public class SpotifyPlayerServiceImpl extends SpotifyBaseService implements Spot
         }
 
         String accessToken = validAccessTokenOpt.get();
-        if (play) {
+        if (newPlayState) {
             spotifyClient.togglePlay().startResumeUsersPlayback_Sync(accessToken);
         } else {
             spotifyClient.togglePlay().pauseUsersPlayback_Sync(accessToken);
@@ -30,6 +32,10 @@ public class SpotifyPlayerServiceImpl extends SpotifyBaseService implements Spot
 
         CurrentlyPlayingContext playingContext = spotifyClient.currentPlaybackInfo().getInformationAboutUsersCurrentPlayback_Sync(accessToken);
 
-        return playingContext.getIs_playing() == play;
+        if (playingContext != null) {
+            return playingContext.getIs_playing() == newPlayState;
+        }
+
+        return false;
     }
 }

@@ -10,7 +10,7 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
     List<Room> findAllByHostId(String hostId);
 
-    Optional<Room> findByHostIdAndActiveIsTrue(String hostId)
+    Optional<Room> findByHostIdAndActiveIsTrue(String hostId);
 
     Optional<Room> findByCodeAndActive(String code, boolean active);
 
