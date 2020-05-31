@@ -9,11 +9,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class RoomSetupServiceImpl implements RoomSetupService{
+public class RoomAdminServiceImpl implements RoomAdminService {
 
     private final RoomRepository roomRepository;
     private final SpotifyPlayerService spotifyPlayerService;
@@ -51,10 +52,15 @@ public class RoomSetupServiceImpl implements RoomSetupService{
 
     @Override
     public void activateRoom(String userId, String roomCode) {
+        Optional<Room> currentActiveRoom = roomRepository.findByHostIdAndActiveIsTrue(userId);
+        updateActiveStatus(currentActiveRoom, userId);
 
         Optional<Room> existingRoom = roomRepository.findByCode(roomCode);
+        updateActiveStatus(existingRoom, userId);
+    }
 
-        existingRoom.ifPresent(room -> {
+    private void updateActiveStatus(Optional<Room> roomOpt, String userId) {
+        roomOpt.ifPresent(room -> {
             if(room.getHostId().equals(userId)) {
                 room.setActive(!room.isActive());
                 roomRepository.save(room);
@@ -73,5 +79,10 @@ public class RoomSetupServiceImpl implements RoomSetupService{
 
         boolean toggled = spotifyPlayerService.togglePlayPause(userId,  activeRoomOpt.get().isPlay());
         return ResponseEntity.ok(toggled);
+    }
+
+    @Override
+    public List<Room> getUserRooms(String userId) {
+        return roomRepository.findAllByHostId(userId);
     }
 }
