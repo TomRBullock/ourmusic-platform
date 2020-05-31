@@ -26,8 +26,9 @@ public class SpotifyConfig {
         String callbackUri = env.getRequiredProperty("spotify.callback-uri");
         String clientId = env.getRequiredProperty("spotify.client-id");
         String clientSecret = env.getRequiredProperty("spotify.client-secret");
+        String scope = env.getRequiredProperty("spotify.scope");
 
-        SpotifyCredentials spotifyCredentials = new SpotifyCredentials(clientId, clientSecret, callbackUri);
+        SpotifyCredentials spotifyCredentials = new SpotifyCredentials(clientId, clientSecret, callbackUri, scope);
         return new SpotifyClient(spotifyCredentials);
     }
 

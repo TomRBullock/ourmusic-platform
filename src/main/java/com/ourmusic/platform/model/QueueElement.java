@@ -6,8 +6,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Queue {
+public class QueueElement {
 
-    public List<TrackSimplified> songs;
+    public TrackSimplified song;
+    public Integer votes;
 
 }
