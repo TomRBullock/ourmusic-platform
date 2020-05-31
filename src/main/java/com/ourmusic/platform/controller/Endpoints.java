@@ -23,8 +23,12 @@ public interface Endpoints {
         String ROOT = Endpoints.ROOT + "/room";
         String VALIDATE = "/validate";
 
-        String SETUP = "/setup";
-//        String CREATE = "/create";
+        interface SETUP {
+            String ROOT = ROOM.ROOT + "/setup";
+            String ACTIVATE = "/activate";
+            String TOGGLE_PLAY = "/toggle-play";
+        }
+
     }
 
     interface SPOTIFY {

@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class RoomSetupVO {
-    private String hostRef;
+    private String hostId;
     private String roomName;
     private String description;
     private String password;

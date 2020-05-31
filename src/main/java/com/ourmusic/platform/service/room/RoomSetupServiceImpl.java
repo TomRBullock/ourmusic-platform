@@ -2,17 +2,21 @@ package com.ourmusic.platform.service.room;
 
 import com.ourmusic.platform.model.Room;
 import com.ourmusic.platform.repository.RoomRepository;
+import com.ourmusic.platform.service.spotify.SpotifyPlayerService;
 import com.ourmusic.platform.vo.request.room.RoomSetupVO;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RoomSetupServiceImpl implements RoomSetupService{
 
     private final RoomRepository roomRepository;
+    private final SpotifyPlayerService spotifyPlayerService;
 
     @Override
     public void createNewRoom(String userId, RoomSetupVO setupVO) {
@@ -33,6 +37,41 @@ public class RoomSetupServiceImpl implements RoomSetupService{
     }
 
     private String generateRoomCode() {
-        return RandomStringUtils.randomAlphanumeric(6);
+        return RandomStringUtils.randomAlphanumeric(8);
+    }
+
+    @Override
+    public boolean deleteRoom(String userId, String roomCode) {
+        long numDeleted = roomRepository.deleteByCodeAndHostId(roomCode, userId);
+        if (numDeleted > 0L) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void activateRoom(String userId, String roomCode) {
+
+        Optional<Room> existingRoom = roomRepository.findByCode(roomCode);
+
+        existingRoom.ifPresent(room -> {
+            if(room.getHostId().equals(userId)) {
+                room.setActive(!room.isActive());
+                roomRepository.save(room);
+            }
+        });
+    }
+
+    @Override
+    public ResponseEntity<Boolean> togglePlayPause(String userId) {
+
+        Optional<Room> activeRoomOpt = roomRepository.findByHostIdAndActiveIsTrue(userId);
+
+        if (!activeRoomOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        boolean toggled = spotifyPlayerService.togglePlayPause(userId,  activeRoomOpt.get().isPlay());
+        return ResponseEntity.ok(toggled);
     }
 }
