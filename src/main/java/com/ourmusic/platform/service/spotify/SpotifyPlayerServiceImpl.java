@@ -46,4 +46,13 @@ public class SpotifyPlayerServiceImpl extends SpotifyBaseService implements Spot
                 .map(accessToken -> spotifyClient.currentPlaybackInfo().getInformationAboutUsersCurrentPlayback_Sync(accessToken))
                 .orElse(null);
     }
+
+    @Override
+    public void addTrackToPlayback(String hostId, String trackUri) {
+        Optional<String> validAccessTokenOpt = spotifyAuthorizationService.getValidAccessToken(hostId);
+
+        validAccessTokenOpt.ifPresent(accessToken -> {
+            spotifyClient.addTrackToQueue().addItemToUsersPlaybackQueue_Sync(accessToken, trackUri);
+        });
+    }
 }

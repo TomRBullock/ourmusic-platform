@@ -8,6 +8,7 @@ import com.wrapper.spotify.model_objects.specification.TrackSimplified;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +43,7 @@ public class RoomServiceImpl implements RoomService {
         }
 
         Room room = roomOpt.get();
-        room.getQueue().add(new QueueElement(track, 0));
+        room.getQueue().add(new QueueElement(track, 0, Instant.now()));
         roomRepository.save(room);
 
         return true;

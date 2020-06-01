@@ -8,6 +8,6 @@ public class PlayingSongElement {
 
     private TrackSimplified track;
 
-    private Integer skipVotes;
+    private Integer skipVotes = 0;
 
 }

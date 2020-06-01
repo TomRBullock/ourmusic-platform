@@ -8,4 +8,6 @@ public interface SpotifyPlayerService {
 
     CurrentlyPlayingContext getUsersCurrentPlayback(String hostId);
 
+    void addTrackToPlayback(String hostId, String trackUri);
+
 }
