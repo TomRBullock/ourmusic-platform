@@ -6,20 +6,15 @@ import com.ourmusic.platform.model.submodel.QueueElement;
 import com.ourmusic.platform.repository.RoomRepository;
 import com.ourmusic.platform.service.spotify.SpotifyPlayerService;
 import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlayingContext;
-import com.wrapper.spotify.model_objects.specification.TrackSimplified;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.wrapper.spotify.model_objects.specification.Track;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collector;
 
-//@Service
-//@RequiredArgsConstructor
 public class QueueScheduleImpl implements QueueSchedule {
 
     private ThreadPoolTaskScheduler taskScheduler;
@@ -55,7 +50,7 @@ public class QueueScheduleImpl implements QueueSchedule {
     }
 
     private static class QueueTask implements Runnable{
-        private final Room room;
+        private Room room;
         private final SpotifyPlayerService spotifyPlayerService;
         private final RoomRepository roomRepository;
 
@@ -65,16 +60,19 @@ public class QueueScheduleImpl implements QueueSchedule {
             this.room = room;
             this.spotifyPlayerService = spotifyPlayerService;
             this.roomRepository = roomRepository;
+
+            System.out.println(new Date()+" Runnable Task with "+ room.getId() +" on thread "+ Thread.currentThread().getName());
+
         }
 
         @Override
         public void run() {
-            System.out.println(new Date()+" Runnable Task with "+ room.getId() +" on thread "+ Thread.currentThread().getName());
 
             CurrentlyPlayingContext usersCurrentPlayback = spotifyPlayerService.getUsersCurrentPlayback(room.getHostId());
 
             //Current track soon ending, queue up next song and lock
-            if (usersCurrentPlayback.getProgress_ms() > usersCurrentPlayback.getItem().getDurationMs() * 0.9) {
+            if (usersCurrentPlayback.getProgress_ms() > ((Track)usersCurrentPlayback.getItem()).getDurationMs() * 0.95
+                    && noCurrentLock()) {
                 Optional<String> trackUriOpt = getHighestVotedOrEarliestTrackAndLock();
                 trackUriOpt.ifPresent(trackUri -> spotifyPlayerService.addTrackToPlayback(room.getHostId(), trackUri));
             }
@@ -83,6 +81,8 @@ public class QueueScheduleImpl implements QueueSchedule {
             if (previousTime.get() > usersCurrentPlayback.getProgress_ms()) {
                 updateCurrentSongForRoom();
             }
+
+            this.room = roomRepository.findById(room.getId()).orElse(this.room);
 
             previousTime.set(usersCurrentPlayback.getProgress_ms());
 
@@ -107,17 +107,21 @@ public class QueueScheduleImpl implements QueueSchedule {
         }
 
         private void updateCurrentSongForRoom() {
-            getQueueElement().ifPresent(element -> {
+            Optional<QueueElement> queueElementOpt = getQueueElement();
 
+            if (queueElementOpt.isPresent()) {
+                QueueElement element = queueElementOpt.get();
                 PlayingSongElement playingSongElement = new PlayingSongElement();
                 playingSongElement.setTrack(element.getSong());
                 room.setPlayingSong(playingSongElement);
 
                 room.getQueue().remove(element);
 
-                roomRepository.save(room);
+            } else {
+                room.setPlayingSong(null);
+            }
 
-            });
+            roomRepository.save(room);
         }
 
         private Optional<QueueElement> getQueueElement() {
@@ -128,6 +132,10 @@ public class QueueScheduleImpl implements QueueSchedule {
                                     .max(Comparator.comparing(QueueElement::getTimeAdded))
                                     .orElse(null)
                     ));
+        }
+
+        private boolean noCurrentLock() {
+            return room.getQueue().stream().noneMatch(QueueElement::isVoteLocked);
         }
 
 //        private Optional<QueueElement> getQueueElement(QueueElement queueElement) {

@@ -4,7 +4,6 @@ import com.ourmusic.platform.controller.Endpoints;
 import com.ourmusic.platform.service.spotify.SpotifySearchService;
 import com.wrapper.spotify.enums.ModelObjectType;
 import com.wrapper.spotify.model_objects.AbstractModelObject;
-import com.wrapper.spotify.model_objects.specification.TrackSimplified;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

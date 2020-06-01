@@ -5,8 +5,7 @@ import com.ourmusic.platform.model.Room;
 import com.ourmusic.platform.model.submodel.PlayingSongElement;
 import com.ourmusic.platform.model.submodel.QueueElement;
 import com.ourmusic.platform.service.room.RoomService;
-import com.ourmusic.platform.vo.request.room.AddTrackVO;
-import com.wrapper.spotify.model_objects.specification.TrackSimplified;
+import com.ourmusic.platform.vo.request.room.AddSongToQueueVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +31,9 @@ public class RoomResource {
 
     @PostMapping(Endpoints.ROOM.QUEUE)
     public ResponseEntity<Boolean> addTrackToQueue(@PathVariable(Endpoints.UTIL.ID_PARAM) String roomCode,
-                                                   @RequestBody TrackSimplified trackSimplified) {
+                                                   @RequestBody AddSongToQueueVO addSongToQueueVO) {
 
-        roomService.addSongToQueue(roomCode, trackSimplified);
+        roomService.addSongToQueue(roomCode, addSongToQueueVO.getTrack());
         return ResponseEntity.ok(true);
     }
 

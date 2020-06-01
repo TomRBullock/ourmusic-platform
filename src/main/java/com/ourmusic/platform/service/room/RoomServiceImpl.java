@@ -3,8 +3,9 @@ package com.ourmusic.platform.service.room;
 import com.ourmusic.platform.model.submodel.PlayingSongElement;
 import com.ourmusic.platform.model.submodel.QueueElement;
 import com.ourmusic.platform.model.Room;
+import com.ourmusic.platform.model.submodel.TrackObject;
 import com.ourmusic.platform.repository.RoomRepository;
-import com.wrapper.spotify.model_objects.specification.TrackSimplified;
+import com.wrapper.spotify.model_objects.specification.Track;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.ourmusic.platform.util.converter.trackToTrackObjectUtil.trackToTrackObject;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +37,9 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public boolean addSongToQueue(String roomCode, TrackSimplified track) {
+    public boolean addSongToQueue(String roomCode, Track track) {
+
+        TrackObject trackObject = trackToTrackObject(track);
 
         Optional<Room> roomOpt = roomRepository.findByCode(roomCode);
 
@@ -43,7 +48,13 @@ public class RoomServiceImpl implements RoomService {
         }
 
         Room room = roomOpt.get();
-        room.getQueue().add(new QueueElement(track, 0, Instant.now()));
+        QueueElement queueElement = new QueueElement();
+        queueElement.setSong(trackObject);
+        queueElement.setTimeAdded(Instant.now());
+        queueElement.setVotes(0);
+        queueElement.setVoteLocked(false);
+
+        room.getQueue().add(queueElement);
         roomRepository.save(room);
 
         return true;

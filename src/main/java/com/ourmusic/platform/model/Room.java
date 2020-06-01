@@ -2,7 +2,6 @@ package com.ourmusic.platform.model;
 
 import com.ourmusic.platform.model.submodel.PlayingSongElement;
 import com.ourmusic.platform.model.submodel.QueueElement;
-import com.wrapper.spotify.model_objects.specification.TrackSimplified;
 import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
