@@ -23,6 +23,9 @@ public interface Endpoints {
         String ROOT = Endpoints.ROOT + "/room";
         String VALIDATE = "/validate";
 
+        String SONG = "/song";
+        String QUEUE = "/queue";
+
         interface ADMIN {
             String ROOT = ROOM.ROOT + "/admin";
             String ACTIVATE = "/activate";
@@ -42,6 +45,10 @@ public interface Endpoints {
 
         interface USER {
             String ROOT = SPOTIFY.ROOT + "/user";
+        }
+
+        interface SEARCH {
+            String ROOT = SPOTIFY.ROOT + "/search";
         }
 
     }
