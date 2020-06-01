@@ -39,7 +39,7 @@ public class RoomAdminServiceImpl implements RoomAdminService {
     }
 
     private String generateRoomCode() {
-        return RandomStringUtils.randomAlphanumeric(6,8).toUpperCase();
+        return RandomStringUtils.randomAlphanumeric(6,9).toUpperCase();
     }
 
     @Override

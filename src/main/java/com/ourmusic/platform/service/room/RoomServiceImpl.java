@@ -2,7 +2,6 @@ package com.ourmusic.platform.service.room;
 
 import com.ourmusic.platform.model.Room;
 import com.ourmusic.platform.repository.RoomRepository;
-import com.ourmusic.platform.vo.response.room.RoomValidityCheckVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,20 +14,16 @@ public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
 
     @Override
-    public Optional<Room> getRoom(String roomRef) {
-        return roomRepository.findById(roomRef);
+    public Optional<Room> getRoom(String roomCode) {
+        return roomRepository.findByCodeAndActiveIsTrue(roomCode);
     }
 
     @Override
-    public RoomValidityCheckVO checkRoomIsValid(String roomRef) {
-        RoomValidityCheckVO roomValidityCheckVO = new RoomValidityCheckVO();
-
-        Optional<Room> roomOpt = roomRepository.findById(roomRef);
+    public boolean checkRoomIsValid(String roomCode) {
+        Optional<Room> roomOpt = roomRepository.findByCodeAndActiveIsTrue(roomCode);
         if (roomOpt.isPresent()) {
-            Room room = roomOpt.get();
-            if (room.isActive())
-                roomValidityCheckVO.setValid(true);
+            return true;
         }
-        return roomValidityCheckVO;
+        return false;
     }
 }
