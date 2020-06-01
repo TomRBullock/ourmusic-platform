@@ -79,6 +79,7 @@ public class RoomAdminServiceImpl implements RoomAdminService {
                 room.setActive(!room.isActive());
                 room.setPlay(false);
                 roomRepository.save(room);
+                queueService.stopQueue(room);
             }
         });
     }

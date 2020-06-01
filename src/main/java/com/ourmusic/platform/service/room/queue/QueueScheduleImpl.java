@@ -3,6 +3,7 @@ package com.ourmusic.platform.service.room.queue;
 import com.ourmusic.platform.model.Room;
 import com.ourmusic.platform.model.submodel.PlayingSongElement;
 import com.ourmusic.platform.model.submodel.QueueElement;
+import com.ourmusic.platform.model.submodel.TrackObject;
 import com.ourmusic.platform.repository.RoomRepository;
 import com.ourmusic.platform.service.spotify.SpotifyPlayerService;
 import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlayingContext;
@@ -14,6 +15,8 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.ourmusic.platform.util.converter.trackToTrackObjectUtil.trackToTrackObject;
 
 public class QueueScheduleImpl implements QueueSchedule {
 
@@ -82,6 +85,12 @@ public class QueueScheduleImpl implements QueueSchedule {
                 updateCurrentSongForRoom();
             }
 
+            //Current track differs from playback, update current song
+            if ( room.getPlayingSong() == null
+                    || !((Track)usersCurrentPlayback.getItem()).getUri().equals(room.getPlayingSong().getTrack().getUri())){
+                setSongWhenDifferent((Track)usersCurrentPlayback.getItem());
+            }
+
             this.room = roomRepository.findById(room.getId()).orElse(this.room);
 
             previousTime.set(usersCurrentPlayback.getProgress_ms());
@@ -104,6 +113,14 @@ public class QueueScheduleImpl implements QueueSchedule {
             queueElement.setVoteLocked(true);
 //            getQueueElement(queueElement).ifPresent(element -> element.setVoteLocked(true));
             this.roomRepository.save(room);
+        }
+
+        private void setSongWhenDifferent(Track track) {
+            TrackObject trackObject = trackToTrackObject(track);
+            PlayingSongElement playingSongElement = new PlayingSongElement();
+            playingSongElement.setTrack(trackObject);
+            room.setPlayingSong(playingSongElement);
+            roomRepository.save(room);
         }
 
         private void updateCurrentSongForRoom() {
