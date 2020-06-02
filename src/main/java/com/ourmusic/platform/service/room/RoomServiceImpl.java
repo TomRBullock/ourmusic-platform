@@ -5,8 +5,10 @@ import com.ourmusic.platform.model.submodel.QueueElement;
 import com.ourmusic.platform.model.Room;
 import com.ourmusic.platform.model.submodel.TrackObject;
 import com.ourmusic.platform.repository.RoomRepository;
+import com.ourmusic.platform.websocket.QueueSocket;
 import com.wrapper.spotify.model_objects.specification.Track;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -21,6 +23,7 @@ import static com.ourmusic.platform.util.converter.trackToTrackObjectUtil.trackT
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
+    private final QueueSocket queueSocket;
 
     @Override
     public Optional<Room> getRoom(String roomCode) {
@@ -56,6 +59,8 @@ public class RoomServiceImpl implements RoomService {
 
         room.getQueue().add(queueElement);
         roomRepository.save(room);
+
+        queueSocket.sendMessage(room);
 
         return true;
     }

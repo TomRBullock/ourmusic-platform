@@ -6,6 +6,8 @@ import com.ourmusic.platform.model.submodel.QueueElement;
 import com.ourmusic.platform.model.submodel.TrackObject;
 import com.ourmusic.platform.repository.RoomRepository;
 import com.ourmusic.platform.service.spotify.SpotifyPlayerService;
+import com.ourmusic.platform.websocket.CurrentSongSocket;
+import com.ourmusic.platform.websocket.QueueSocket;
 import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlayingContext;
 import com.wrapper.spotify.model_objects.specification.Track;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -22,7 +24,8 @@ public class QueueScheduleImpl implements QueueSchedule {
 
     private ThreadPoolTaskScheduler taskScheduler;
     private RoomRepository roomRepository;
-    private CurrentSongService currentSongService;
+    private CurrentSongSocket currentSongSocket;
+    private QueueSocket queueSocket;
 
 
     private ScheduledFuture<?> scheduledFuture;
@@ -32,12 +35,14 @@ public class QueueScheduleImpl implements QueueSchedule {
 
 
     public QueueScheduleImpl(RoomRepository roomRepository, ThreadPoolTaskScheduler taskScheduler, Room room,
-                             SpotifyPlayerService spotifyPlayerService, CurrentSongService currentSongService) {
+                             SpotifyPlayerService spotifyPlayerService, CurrentSongSocket currentSongSocket,
+                             QueueSocket queueSocket) {
         this.roomRepository = roomRepository;
         this.taskScheduler = taskScheduler;
         this.room = room;
         this.spotifyPlayerService = spotifyPlayerService;
-        this.currentSongService = currentSongService;
+        this.currentSongSocket = currentSongSocket;
+        this.queueSocket = queueSocket;
     }
 
     @Override
@@ -47,7 +52,9 @@ public class QueueScheduleImpl implements QueueSchedule {
 
     @Override
     public void playRoom() {
-        this.scheduledFuture = taskScheduler.scheduleWithFixedDelay(new QueueTask(room, this.spotifyPlayerService, this.roomRepository, currentSongService), 4000);
+        this.scheduledFuture = taskScheduler.scheduleWithFixedDelay(
+                new QueueTask(room, this.spotifyPlayerService, this.roomRepository, currentSongSocket, queueSocket),
+                4000);
     }
 
     @Override
@@ -59,15 +66,18 @@ public class QueueScheduleImpl implements QueueSchedule {
         private Room room;
         private final SpotifyPlayerService spotifyPlayerService;
         private final RoomRepository roomRepository;
-        private final CurrentSongService currentSongService;
+        private final CurrentSongSocket currentSongSocket;
+        private final QueueSocket queueSocket;
 
         private final AtomicInteger previousTime = new AtomicInteger(0);
 
-        public QueueTask(Room room, SpotifyPlayerService spotifyPlayerService, RoomRepository roomRepository, CurrentSongService currentSongService){
+        public QueueTask(Room room, SpotifyPlayerService spotifyPlayerService, RoomRepository roomRepository,
+                         CurrentSongSocket currentSongSocket, QueueSocket queueSocket){
             this.room = room;
             this.spotifyPlayerService = spotifyPlayerService;
             this.roomRepository = roomRepository;
-            this.currentSongService = currentSongService;
+            this.currentSongSocket = currentSongSocket;
+            this.queueSocket = queueSocket;
 
             System.out.println(new Date()+" Runnable Task with "+ room.getId() +" on thread "+ Thread.currentThread().getName());
 
@@ -99,7 +109,7 @@ public class QueueScheduleImpl implements QueueSchedule {
             this.room = roomRepository.findById(room.getId()).orElse(this.room);
             this.room.getPlayingSong().setProgressMs(usersCurrentPlayback.getProgress_ms());
 
-            currentSongService.sendMessage(room.getCode(), room.getPlayingSong());
+            currentSongSocket.sendMessage(room.getCode(), room.getPlayingSong());
 
             previousTime.set(usersCurrentPlayback.getProgress_ms());
 
@@ -141,6 +151,7 @@ public class QueueScheduleImpl implements QueueSchedule {
                 room.setPlayingSong(playingSongElement);
 
                 room.getQueue().remove(element);
+                queueSocket.sendMessage(room);
             } else {
                 room.setPlayingSong(null);
             }

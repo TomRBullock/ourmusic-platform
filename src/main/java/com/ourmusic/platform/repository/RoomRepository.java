@@ -18,4 +18,6 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
     long deleteByIdAndHostId(String id, String hostId);
 
+    List<Room> findAllByPlayTrue();
+
 }
