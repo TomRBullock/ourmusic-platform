@@ -26,6 +26,8 @@ public interface Endpoints {
         String SONG = "/song";
         String QUEUE = "/queue";
 
+        String JOIN = "/join";
+
         interface ADMIN {
             String ROOT = ROOM.ROOT + "/admin";
             String ACTIVATE = "/activate";

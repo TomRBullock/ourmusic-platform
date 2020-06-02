@@ -66,20 +66,16 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<QueueElement> getRoomQueue(String roomCode) {
-
+    public void updateUserEstimate(String roomCode, boolean joined) {
         Optional<Room> roomOpt = roomRepository.findByCode(roomCode);
 
-        if (roomOpt.isPresent()) {
-            return roomOpt.get().getQueue();
-        }
-
-        return new ArrayList<>();
-    }
-
-    @Override
-    public Optional<PlayingSongElement> getPlayingSong(String roomCode) {
-        Optional<Room> roomOpt = roomRepository.findByCode(roomCode);
-        return roomOpt.map(Room::getPlayingSong);
+        roomOpt.ifPresent(room -> {
+            if (joined) {
+                room.setUsersEstimate(room.getUsersEstimate() + 1);
+            } else {
+                room.setUsersEstimate(room.getUsersEstimate() - 1);
+            }
+            roomRepository.save(room);
+        });
     }
 }

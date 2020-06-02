@@ -30,4 +30,6 @@ public class Room extends BaseDocument {
 
     private boolean play = false;
 
+    private Integer usersEstimate = 0;
+
 }

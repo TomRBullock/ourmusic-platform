@@ -6,6 +6,7 @@ import com.ourmusic.platform.model.submodel.PlayingSongElement;
 import com.ourmusic.platform.model.submodel.QueueElement;
 import com.ourmusic.platform.service.room.RoomService;
 import com.ourmusic.platform.vo.request.room.AddSongToQueueVO;
+import com.ourmusic.platform.vo.request.room.UserEstimateVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,14 +38,11 @@ public class RoomResource {
         return ResponseEntity.ok(true);
     }
 
-    @GetMapping(Endpoints.ROOM.QUEUE)
-    public ResponseEntity<List<QueueElement>> getRoomQueue(@PathVariable(Endpoints.UTIL.ID_PARAM) String roomCode) {
-        return ResponseEntity.ok(roomService.getRoomQueue(roomCode));
-    }
-
-    @GetMapping(Endpoints.ROOM.SONG)
-    public ResponseEntity<PlayingSongElement> getPlayingSong(@PathVariable(Endpoints.UTIL.ID_PARAM) String roomCode) {
-        return ResponseEntity.of(roomService.getPlayingSong(roomCode));
+    @PostMapping(Endpoints.ROOM.JOIN)
+    public ResponseEntity<Void> updateUserEstimate(@PathVariable(Endpoints.UTIL.ID_PARAM) String roomCode,
+                                                   @RequestBody UserEstimateVO userEstimateVO) {
+        roomService.updateUserEstimate(roomCode, userEstimateVO.isJoined());
+        return ResponseEntity.ok().build();
     }
 
 }

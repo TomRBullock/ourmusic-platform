@@ -16,8 +16,6 @@ public interface RoomService {
 
     boolean addSongToQueue(String roomCode, Track track);
 
-    List<QueueElement> getRoomQueue(String roomCode);
-
-    Optional<PlayingSongElement> getPlayingSong(String roomCode);
+    void updateUserEstimate(String roomCode, boolean joined);
 
 }
