@@ -134,8 +134,8 @@ public class QueueScheduleImpl implements QueueSchedule {
 
         private void voteLockQueueElement(QueueElement queueElement) {
             queueElement.setVoteLocked(true);
-//            getQueueElement(queueElement).ifPresent(element -> element.setVoteLocked(true));
             this.roomRepository.save(room);
+            queueSocket.sendMessage(room);
         }
 
         private void setSongWhenDifferent(Track track) {
