@@ -1,11 +1,8 @@
 package com.ourmusic.platform.model.submodel;
 
-import com.wrapper.spotify.model_objects.specification.Track;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.List;
 
 @Data
 public class QueueElement {

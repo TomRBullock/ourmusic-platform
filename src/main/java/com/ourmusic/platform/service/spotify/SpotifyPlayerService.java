@@ -10,4 +10,6 @@ public interface SpotifyPlayerService {
 
     void addTrackToPlayback(String hostId, String trackUri);
 
+    void skipPlayingTrack(String hostId);
+
 }

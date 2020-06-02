@@ -88,7 +88,7 @@ public class QueueScheduleImpl implements QueueSchedule {
 
             CurrentlyPlayingContext usersCurrentPlayback = spotifyPlayerService.getUsersCurrentPlayback(room.getHostId());
 
-            //Current track soon ending, queue up next song and lock
+            //Current track is empty or soon ending, queue up next song and lock
             if ( usersCurrentPlayback == null || (usersCurrentPlayback.getProgress_ms() > ((Track)usersCurrentPlayback.getItem()).getDurationMs() * 0.95
                     && noCurrentLock())) {
                 Optional<String> trackUriOpt = getHighestVotedOrEarliestTrackAndLock();
@@ -96,7 +96,7 @@ public class QueueScheduleImpl implements QueueSchedule {
             }
 
             //New song playing, update current song
-            if (previousTime.get() > usersCurrentPlayback.getProgress_ms()) {
+            if (usersCurrentPlayback != null && previousTime.get() > usersCurrentPlayback.getProgress_ms()) {
                 updateCurrentSongForRoom();
             }
 
@@ -104,6 +104,11 @@ public class QueueScheduleImpl implements QueueSchedule {
             if ( room.getPlayingSong() == null
                     || !((Track)usersCurrentPlayback.getItem()).getUri().equals(room.getPlayingSong().getTrack().getUri())){
                 setSongWhenDifferent((Track)usersCurrentPlayback.getItem());
+            }
+
+            //Check song votes, skip song
+            if (room.getPlayingSong().getSkipVotes() > (room.getUsersEstimate() * 0.5)) {
+                skipCurrentSong();
             }
 
             this.room = roomRepository.findById(room.getId()).orElse(this.room);
@@ -172,12 +177,9 @@ public class QueueScheduleImpl implements QueueSchedule {
             return room.getQueue().stream().noneMatch(QueueElement::isVoteLocked);
         }
 
-//        private Optional<QueueElement> getQueueElement(QueueElement queueElement) {
-//            return room.getQueue().stream()
-//                    .filter(element -> element.getTimeAdded().equals(queueElement.getTimeAdded())
-//                            && element.getSong().getId().equals(queueElement.getSong().getId()))
-//                    .findAny();
-//        }
+        private void skipCurrentSong() {
+            spotifyPlayerService.skipPlayingTrack(room.getHostId());
+        }
     }
 
 }

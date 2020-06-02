@@ -34,6 +34,13 @@ public interface Endpoints {
             String TOGGLE_PLAY = "/toggle-play";
         }
 
+        interface VOTES {
+            String ROOT = ROOM.ROOT + UTIL.ID_VAR + "/vote";
+            String ADD = "/add";
+            String REMOVE = "/remove";
+            String SKIP = "/skip";
+        }
+
     }
 
     interface SPOTIFY {
