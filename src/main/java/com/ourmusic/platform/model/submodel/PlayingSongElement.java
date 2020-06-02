@@ -7,6 +7,9 @@ import lombok.Data;
 public class PlayingSongElement {
 
     private TrackObject track;
+
+    private Integer progressMs = 0;
+
     private Integer skipVotes = 0;
 
 }

@@ -18,7 +18,7 @@ public class QueueServiceImpl implements QueueService {
     private final ThreadPoolTaskScheduler taskScheduler;
     private final RoomRepository roomRepository;
     private final SpotifyPlayerService spotifyPlayerService;
-
+    private final CurrentSongService currentSongService;
 
     private final Map<String, QueueSchedule> queueScheduleMap = new HashMap<>();
 
@@ -43,7 +43,7 @@ public class QueueServiceImpl implements QueueService {
             return queueScheduleMap.get(room.getId());
 
         } else {
-            QueueScheduleImpl queueSchedule = new QueueScheduleImpl(roomRepository, taskScheduler, room, spotifyPlayerService);
+            QueueScheduleImpl queueSchedule = new QueueScheduleImpl(roomRepository, taskScheduler, room, spotifyPlayerService, currentSongService);
             queueScheduleMap.put(room.getId(), queueSchedule);
             return queueSchedule;
         }

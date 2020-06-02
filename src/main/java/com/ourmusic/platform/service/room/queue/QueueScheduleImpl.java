@@ -22,6 +22,8 @@ public class QueueScheduleImpl implements QueueSchedule {
 
     private ThreadPoolTaskScheduler taskScheduler;
     private RoomRepository roomRepository;
+    private CurrentSongService currentSongService;
+
 
     private ScheduledFuture<?> scheduledFuture;
     private final Room room;
@@ -30,11 +32,12 @@ public class QueueScheduleImpl implements QueueSchedule {
 
 
     public QueueScheduleImpl(RoomRepository roomRepository, ThreadPoolTaskScheduler taskScheduler, Room room,
-                             SpotifyPlayerService spotifyPlayerService) {
+                             SpotifyPlayerService spotifyPlayerService, CurrentSongService currentSongService) {
         this.roomRepository = roomRepository;
         this.taskScheduler = taskScheduler;
         this.room = room;
         this.spotifyPlayerService = spotifyPlayerService;
+        this.currentSongService = currentSongService;
     }
 
     @Override
@@ -44,7 +47,7 @@ public class QueueScheduleImpl implements QueueSchedule {
 
     @Override
     public void playRoom() {
-        this.scheduledFuture = taskScheduler.scheduleWithFixedDelay(new QueueTask(room, this.spotifyPlayerService, this.roomRepository), 4000);
+        this.scheduledFuture = taskScheduler.scheduleWithFixedDelay(new QueueTask(room, this.spotifyPlayerService, this.roomRepository, currentSongService), 4000);
     }
 
     @Override
@@ -56,13 +59,15 @@ public class QueueScheduleImpl implements QueueSchedule {
         private Room room;
         private final SpotifyPlayerService spotifyPlayerService;
         private final RoomRepository roomRepository;
+        private final CurrentSongService currentSongService;
 
         private final AtomicInteger previousTime = new AtomicInteger(0);
 
-        public QueueTask(Room room, SpotifyPlayerService spotifyPlayerService, RoomRepository roomRepository){
+        public QueueTask(Room room, SpotifyPlayerService spotifyPlayerService, RoomRepository roomRepository, CurrentSongService currentSongService){
             this.room = room;
             this.spotifyPlayerService = spotifyPlayerService;
             this.roomRepository = roomRepository;
+            this.currentSongService = currentSongService;
 
             System.out.println(new Date()+" Runnable Task with "+ room.getId() +" on thread "+ Thread.currentThread().getName());
 
@@ -74,8 +79,8 @@ public class QueueScheduleImpl implements QueueSchedule {
             CurrentlyPlayingContext usersCurrentPlayback = spotifyPlayerService.getUsersCurrentPlayback(room.getHostId());
 
             //Current track soon ending, queue up next song and lock
-            if (usersCurrentPlayback.getProgress_ms() > ((Track)usersCurrentPlayback.getItem()).getDurationMs() * 0.95
-                    && noCurrentLock()) {
+            if ( usersCurrentPlayback == null || (usersCurrentPlayback.getProgress_ms() > ((Track)usersCurrentPlayback.getItem()).getDurationMs() * 0.95
+                    && noCurrentLock())) {
                 Optional<String> trackUriOpt = getHighestVotedOrEarliestTrackAndLock();
                 trackUriOpt.ifPresent(trackUri -> spotifyPlayerService.addTrackToPlayback(room.getHostId(), trackUri));
             }
@@ -92,6 +97,9 @@ public class QueueScheduleImpl implements QueueSchedule {
             }
 
             this.room = roomRepository.findById(room.getId()).orElse(this.room);
+            this.room.getPlayingSong().setProgressMs(usersCurrentPlayback.getProgress_ms());
+
+            currentSongService.sendMessage(room.getCode(), room.getPlayingSong());
 
             previousTime.set(usersCurrentPlayback.getProgress_ms());
 
@@ -133,11 +141,9 @@ public class QueueScheduleImpl implements QueueSchedule {
                 room.setPlayingSong(playingSongElement);
 
                 room.getQueue().remove(element);
-
             } else {
                 room.setPlayingSong(null);
             }
-
             roomRepository.save(room);
         }
 
