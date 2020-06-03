@@ -91,8 +91,7 @@ public class QueueScheduleImpl implements QueueSchedule {
             //Current track is empty or soon ending, queue up next song and lock
             if ( usersCurrentPlayback == null || (usersCurrentPlayback.getProgress_ms() > ((Track)usersCurrentPlayback.getItem()).getDurationMs() * 0.95
                     && noCurrentLock())) {
-                Optional<String> trackUriOpt = getHighestVotedOrEarliestTrackAndLock();
-                trackUriOpt.ifPresent(trackUri -> spotifyPlayerService.addTrackToPlayback(room.getHostId(), trackUri));
+                addTrackToPlayback();
             }
 
             //New song playing, update current song
@@ -108,6 +107,7 @@ public class QueueScheduleImpl implements QueueSchedule {
 
             //Check song votes, skip song
             if (room.getPlayingSong().getSkipVotes() > (room.getUsersEstimate() * 0.5)) {
+                addTrackToPlayback();
                 skipCurrentSong();
             }
 
@@ -118,6 +118,11 @@ public class QueueScheduleImpl implements QueueSchedule {
 
             previousTime.set(usersCurrentPlayback.getProgress_ms());
 
+        }
+
+        private void addTrackToPlayback() {
+            Optional<String> trackUriOpt = getHighestVotedOrEarliestTrackAndLock();
+            trackUriOpt.ifPresent(trackUri -> spotifyPlayerService.addTrackToPlayback(room.getHostId(), trackUri));
         }
 
         private Optional<String> getHighestVotedOrEarliestTrackAndLock() {
@@ -147,7 +152,7 @@ public class QueueScheduleImpl implements QueueSchedule {
         }
 
         private void updateCurrentSongForRoom() {
-            Optional<QueueElement> queueElementOpt = getQueueElement();
+            Optional<QueueElement> queueElementOpt = getLockedElementOrBackup();
 
             if (queueElementOpt.isPresent()) {
                 QueueElement element = queueElementOpt.get();
@@ -161,6 +166,18 @@ public class QueueScheduleImpl implements QueueSchedule {
                 room.setPlayingSong(null);
             }
             roomRepository.save(room);
+        }
+
+        private Optional<QueueElement> getLockedElementOrBackup() {
+
+            Optional<QueueElement> lockedElement = room.getQueue().stream()
+                    .filter(QueueElement::isVoteLocked)
+                    .findAny();
+
+            if (lockedElement.isPresent()) {
+                return lockedElement;
+            }
+            return getQueueElement();
         }
 
         private Optional<QueueElement> getQueueElement() {

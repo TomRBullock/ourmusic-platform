@@ -73,7 +73,9 @@ public class RoomServiceImpl implements RoomService {
             if (joined) {
                 room.setUsersEstimate(room.getUsersEstimate() + 1);
             } else {
-                room.setUsersEstimate(room.getUsersEstimate() - 1);
+                if (room.getUsersEstimate() > 0){
+                    room.setUsersEstimate(room.getUsersEstimate() - 1);
+                }
             }
             roomRepository.save(room);
         });

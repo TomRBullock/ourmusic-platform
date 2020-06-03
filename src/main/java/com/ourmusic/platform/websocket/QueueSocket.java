@@ -15,7 +15,7 @@ public class QueueSocket extends BaseSocket {
     public void sendMessage(Room room){
 
         List<QueueElement> sortedQueue = room.getQueue().stream()
-                .sorted(Comparator.comparingInt(QueueElement::getVotes))
+                .sorted(Comparator.comparingInt(QueueElement::getVotes).reversed())
                 .collect(Collectors.toList());
 
         super.sendMessage("/topic/"+ room.getCode() +"/queue", sortedQueue);
