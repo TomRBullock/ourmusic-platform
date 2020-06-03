@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        final Optional<User> userEntity = userRepository.findById(username);
+        final Optional<User> userEntity = userRepository.findByUsernameIgnoreCase(username);
 
         if (userEntity.isPresent()) {
             final User user = userEntity.get();
@@ -40,10 +40,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         return null;
     }
-
-//    private String passwordNoEncoding(AppUser appUser) {
-//        // you can use one of bcrypt/noop/pbkdf2/scrypt/sha256
-//        // more: https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-encoding
-//        return "{noop}" + appUser.getUserPass();
-//    }
 }

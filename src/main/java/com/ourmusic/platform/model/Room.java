@@ -1,21 +1,35 @@
 package com.ourmusic.platform.model;
 
-import com.ourmusic.platform.model.spotify.Track;
+import com.ourmusic.platform.model.submodel.PlayingSongElement;
+import com.ourmusic.platform.model.submodel.QueueElement;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Document
 public class Room extends BaseDocument {
 
-    @Id
-    public String id;
+    //6 character String
+    private @Indexed(unique = true) String code;
 
-//    public Queue queue;
+    private @Indexed String hostId;
+    private boolean active = false;
+    private boolean passwordProtected = false;
 
-    public Track playingSong;
+    private String roomName;
+    private String description;
 
-    public String hostRef;
+    private String password;
+
+    private PlayingSongElement playingSong;
+    private List<QueueElement> queue = new ArrayList<>();
+
+    private boolean play = false;
+
+    private Integer usersEstimate = 0;
 
 }

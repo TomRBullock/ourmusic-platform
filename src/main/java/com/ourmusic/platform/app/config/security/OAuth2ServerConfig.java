@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 @EnableAuthorizationServer
 public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
-    public static final String CLIENT_ID = "my-client";
+    public static final String CLIENT_ID = "SampleClientId";
     public static final String CLIENT_SECRET = "{noop}my-secret";
     private static final String GRANT_TYPE_PASSWORD = "password";
     private static final String AUTHORIZATION_CODE = "authorization_code";
@@ -34,27 +34,10 @@ public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
 
     @Override
-    public void configure(
-            AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-        oauthServer.tokenKeyAccess("permitAll()")
-                .checkTokenAccess("isAuthenticated()");
+    public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
+        oauthServer
+                .allowFormAuthenticationForClients();
     }
-
-//    @Override
-//    public void configure(ClientDetailsServiceConfigurer clients)
-//            throws Exception {
-//        clients.inMemory()
-//                .withClient("sampleClientId")
-//                .authorizedGrantTypes("implicit")
-//                .scopes("read")
-//                .autoApprove(true)
-//                .and()
-//                .withClient("clientIdPassword")
-//                .secret("secret")
-//                .authorizedGrantTypes(
-//                        "password","authorization_code", "refresh_token")
-//                .scopes("read");
-//    }
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -69,10 +52,7 @@ public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
     }
 
     @Override
-    public void configure(
-            AuthorizationServerEndpointsConfigurer endpoints)
-            throws Exception {
-
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints
                 .tokenStore(tokenStore())
                 .authenticationManager(authenticationManager);
