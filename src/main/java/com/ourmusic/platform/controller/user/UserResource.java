@@ -2,8 +2,9 @@ package com.ourmusic.platform.controller.user;
 
 import com.ourmusic.platform.app.config.security.UserDetailsImpl;
 import com.ourmusic.platform.controller.Endpoints;
-import com.ourmusic.platform.service.user.UserService;
+import com.ourmusic.platform.service.user.UserRegServiceImpl;
 import com.ourmusic.platform.vo.UserBasicVO;
+import com.ourmusic.platform.vo.request.user.UserRegistrationVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,11 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(Endpoints.USER.ROOT)
 public class UserResource {
 
-    private final UserService userService;
+    private final UserRegServiceImpl userService;
 
     @PostMapping(Endpoints.USER.CREATE)
-    public void createNewUser() {
-        userService.createNewUser("test", "test");
+    public ResponseEntity<Void> createNewUser(@RequestBody UserRegistrationVO userRegistrationVO) {
+        userService.createNewUser(userRegistrationVO.getUsername(), userRegistrationVO.getPassword());
+        return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("#oauth2.hasScope('read')")
