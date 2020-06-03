@@ -12,10 +12,12 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
     Optional<Room> findByHostIdAndActiveIsTrue(String hostId);
 
-    Optional<Room> findByCodeAndActive(String code, boolean active);
+    Optional<Room> findByCodeAndActiveIsTrue(String code);
 
     Optional<Room> findByCode(String Code);
 
     long deleteByIdAndHostId(String id, String hostId);
+
+    List<Room> findAllByPlayTrue();
 
 }

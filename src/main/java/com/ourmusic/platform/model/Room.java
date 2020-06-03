@@ -1,9 +1,13 @@
 package com.ourmusic.platform.model;
 
-import com.wrapper.spotify.model_objects.specification.TrackSimplified;
+import com.ourmusic.platform.model.submodel.PlayingSongElement;
+import com.ourmusic.platform.model.submodel.QueueElement;
 import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Document
@@ -21,9 +25,11 @@ public class Room extends BaseDocument {
 
     private String password;
 
-    private TrackSimplified playingSong;
-    private QueueElement queue;
+    private PlayingSongElement playingSong;
+    private List<QueueElement> queue = new ArrayList<>();
 
     private boolean play = false;
+
+    private Integer usersEstimate = 0;
 
 }

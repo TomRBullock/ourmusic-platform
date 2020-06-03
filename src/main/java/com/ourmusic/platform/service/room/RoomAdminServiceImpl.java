@@ -2,6 +2,8 @@ package com.ourmusic.platform.service.room;
 
 import com.ourmusic.platform.model.Room;
 import com.ourmusic.platform.repository.RoomRepository;
+import com.ourmusic.platform.service.room.queue.QueueSchedule;
+import com.ourmusic.platform.service.room.queue.QueueService;
 import com.ourmusic.platform.service.spotify.SpotifyPlayerService;
 import com.ourmusic.platform.vo.request.room.RoomSetupVO;
 import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlayingContext;
@@ -19,6 +21,7 @@ public class RoomAdminServiceImpl implements RoomAdminService {
 
     private final RoomRepository roomRepository;
     private final SpotifyPlayerService spotifyPlayerService;
+    private final QueueService queueService;
 
     @Override
     public void createNewRoom(String userId, RoomSetupVO setupVO) {
@@ -39,7 +42,7 @@ public class RoomAdminServiceImpl implements RoomAdminService {
     }
 
     private String generateRoomCode() {
-        return RandomStringUtils.randomAlphanumeric(6,8).toUpperCase();
+        return RandomStringUtils.randomAlphanumeric(6,9).toUpperCase();
     }
 
     @Override
@@ -76,6 +79,7 @@ public class RoomAdminServiceImpl implements RoomAdminService {
                 room.setActive(!room.isActive());
                 room.setPlay(false);
                 roomRepository.save(room);
+                queueService.stopQueue(room);
             }
         });
     }
@@ -92,8 +96,16 @@ public class RoomAdminServiceImpl implements RoomAdminService {
         Room room = activeRoomOpt.get();
         boolean toggled = spotifyPlayerService.togglePlayPause(userId,  room.isPlay());
         if (toggled) {
-            room.setPlay(!room.isPlay());
+            boolean newPlayState = !room.isPlay();
+
+            room.setPlay(newPlayState);
             roomRepository.save(room);
+
+            if (newPlayState) {
+                queueService.startQueue(room);
+            } else {
+                queueService.stopQueue(room);
+            }
         }
 
         return ResponseEntity.ok(toggled);

@@ -23,10 +23,22 @@ public interface Endpoints {
         String ROOT = Endpoints.ROOT + "/room";
         String VALIDATE = "/validate";
 
+        String SONG = "/song";
+        String QUEUE = "/queue";
+
+        String JOIN = "/join";
+
         interface ADMIN {
             String ROOT = ROOM.ROOT + "/admin";
             String ACTIVATE = "/activate";
             String TOGGLE_PLAY = "/toggle-play";
+        }
+
+        interface VOTES {
+            String ROOT = ROOM.ROOT + UTIL.ID_VAR + "/vote";
+            String ADD = "/add";
+            String REMOVE = "/remove";
+            String SKIP = "/skip";
         }
 
     }
@@ -42,6 +54,10 @@ public interface Endpoints {
 
         interface USER {
             String ROOT = SPOTIFY.ROOT + "/user";
+        }
+
+        interface SEARCH {
+            String ROOT = SPOTIFY.ROOT + "/search";
         }
 
     }
