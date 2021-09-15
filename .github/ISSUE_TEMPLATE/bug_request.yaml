@@ -1,16 +1,7 @@
 name: Bug Report
 description: File a bug report
 title: "[Bug]: "
-labels: 
-  - type: dropdown
-    id: labels
-    attributes:
-      label: What Team does this issue help?
-      options:
-        - Team - Ops
-        - Team - CRM
-        - Team - Acquisition
-        - Team - Dev
+labels: []
 assignees:
 body:
   - type: markdown
