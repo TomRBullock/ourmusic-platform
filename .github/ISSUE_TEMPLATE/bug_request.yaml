@@ -1,0 +1,58 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: 
+  - type: dropdown
+    id: labels
+    attributes:
+      label: What Team does this issue help?
+      options:
+        - Team - Ops
+        - Team - CRM
+        - Team - Acquisition
+        - Team - Dev
+assignees:
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For all things broken
+  - type: input
+    id: link
+    attributes:
+      label: Link to buggy PQ page
+      description: Help us find it easily! Leave the PQ page link for us
+      placeholder: 
+    validations:
+      required: false
+  - type: textarea
+    id: explaination
+    attributes:
+      label: What is the bug?
+      placeholder: Give some detail on what this issue is
+      value: 
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: How can we help?
+      placeholder: Give some detail on what you expect the correct working to be. |
+       Also point us in the right direction, if possible! Services, Endpoints, Files - anything to help
+      value: 
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers are you seeing the problem on?
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
+  - type: markdown
+    id: footer
+    attributes:
+      value: #Before submitting please make sure this is bug has not already been flagged!
