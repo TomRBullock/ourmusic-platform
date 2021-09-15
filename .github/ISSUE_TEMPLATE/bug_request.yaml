@@ -44,6 +44,5 @@ body:
         - Safari
         - Microsoft Edge
   - type: markdown
-    id: footer
     attributes:
       value: #Before submitting please make sure this is bug has not already been flagged!
